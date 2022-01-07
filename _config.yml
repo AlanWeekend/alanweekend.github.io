@@ -40,7 +40,7 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
@@ -104,9 +104,8 @@ theme: butterfly
 deploy:
   type: git
   repo: https://github.com/AlanWeekend/alanweekend.github.io
-  branch: main
+  branch: blog
 
-algolia:
-  applicationID: P3N9CZFE6F
-  apiKey: 9ccde94c5577c0ce1f54667c110a1127
-  indexName: 9ccde94c5577c0ce1f54667c110a1127
+marked:
+  prependRoot: true
+  postAsset: true
