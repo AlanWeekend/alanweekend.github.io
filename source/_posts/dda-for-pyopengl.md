@@ -6,6 +6,7 @@ categories:
 tags:
 - OpenGL
 - Python
+cover: 1.png
 ---
 ## DDA画线算法
 DDA画线算法也叫数值微分算法。其算法原理如下：
