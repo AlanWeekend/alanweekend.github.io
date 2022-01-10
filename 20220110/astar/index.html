@@ -1,0 +1,305 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想 | 周末的游戏之旅</title><meta name="keywords" content="寻路算法"><meta name="author" content="周末"><meta name="copyright" content="周末"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="简介：搜索区域绿色是起点A，红色是终点B，蓝色的是障碍物强。假设我们要从A点走到B点。 假设整张地图是搜索区域，那么把整张地图划分为方块状的网格，这样便简化了搜索区域，如此便能用二维数组来表示整张地图。而每一个网格分有可行走和不可行走两个状态。通过从A到B走那些网格来确定路径。 开始搜索上一步我们将地图简化为可管理的二维数组，下一步就是搜索最短路径。搜索方法有点类似与八连通种子填充算法。做法是从A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想">
+<meta property="og:url" content="https://yongshen.me/20220110/astar/index.html">
+<meta property="og:site_name" content="周末的游戏之旅">
+<meta property="og:description" content="简介：搜索区域绿色是起点A，红色是终点B，蓝色的是障碍物强。假设我们要从A点走到B点。 假设整张地图是搜索区域，那么把整张地图划分为方块状的网格，这样便简化了搜索区域，如此便能用二维数组来表示整张地图。而每一个网格分有可行走和不可行走两个状态。通过从A到B走那些网格来确定路径。 开始搜索上一步我们将地图简化为可管理的二维数组，下一步就是搜索最短路径。搜索方法有点类似与八连通种子填充算法。做法是从A">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2022-01-10T07:00:23.000Z">
+<meta property="article:modified_time" content="2022-01-10T07:03:40.788Z">
+<meta property="article:author" content="周末">
+<meta property="article:tag" content="寻路算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yongshen.me/20220110/astar/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-10 15:03:40'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="https://yongshen.me/WithWhatForUnity/"><span> WithWhat插件文档</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">周末的游戏之旅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="https://yongshen.me/WithWhatForUnity/"><span> WithWhat插件文档</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-01-10T07:00:23.000Z" title="发表于 2022-01-10 15:00:23">2022-01-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-01-10T07:03:40.788Z" title="更新于 2022-01-10 15:03:40">2022-01-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95/">算法</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/20220110/astar/#post-comment"><span class="gitalk-comment-count"></span></a></span></div></div></div><article class="post-content" id="article-container"><h2 id="简介：搜索区域"><a href="#简介：搜索区域" class="headerlink" title="简介：搜索区域"></a>简介：搜索区域</h2><p>绿色是起点A，红色是终点B，蓝色的是障碍物强。假设我们要从A点走到B点。<br><img src="/20220110/astar/1.jpg"></p>
+<p>假设整张地图是搜索区域，那么把整张地图划分为方块状的网格，这样便简化了搜索区域，如此便能用二维数组来表示整张地图。而每一个网格分有可行走和不可行走两个状态。通过从A到B走那些网格来确定路径。</p>
+<h2 id="开始搜索"><a href="#开始搜索" class="headerlink" title="开始搜索"></a>开始搜索</h2><p>上一步我们将地图简化为可管理的二维数组，下一步就是搜索最短路径。搜索方法有点类似与八连通种子填充算法。做法是从A点开始，检查八连通的网格，以此递归向外搜索直到找到目标。</p>
+<p>搜索的步骤如下：</p>
+<ol>
+<li>创建两个列表，一个是“打开列表”用于存放将要进行搜索，但还没搜索过的网格。另一个是“关闭列表”用于存放已经搜索过的网格。</li>
+<li>从起点A开始，将其添加到要进行搜索的“打开列表中”。</li>
+<li>查看起点附近八连通的所有可行走的网格，这里要忽略掉添加到“关闭列表”中的网格，已经搜索过的网格不必再次搜索，并且将这些网格的父网格设置A，然后将这些网格添加到“打开列表”中。</li>
+<li>从“打开列表”中删除起始网格A，并将其添加到“关闭列表中”。</li>
+</ol>
+<p>这时得到如下图所示的内容，其中绿色的方块是起始网格，带有浅蓝色轮廓的是已经添加到关闭列表中的网格，带有浅绿色轮廓的是已经添加到打开列表中的网格并且这些网格都有一个灰色的指针指向其父网格。<br><img src="/20220110/astar/2.jpg"></p>
+<p>接下来，只要选择打开列表中的一个网格，重复执行A点执行过的步骤就可以了。那么我们该选择哪一个方块作为下一个进行八连通搜索的网格呢？看下一步</p>
+<h2 id="路径评分"><a href="#路径评分" class="headerlink" title="路径评分"></a>路径评分</h2><p>在进行下一步选择时，确定使用哪个方块，需要计算一个路径评分或说时代价。公式如下：</p>
+<blockquote>
+<p>F = G + H<br>其中</p>
+</blockquote>
+<ul>
+<li>G是从起点到当前网格的移动代价，或者说是距离。</li>
+<li>H是从当前网格到终点的移动代价或距离。</li>
+<li>F为G和H的和，表示当前网格的总代价。</li>
+</ul>
+<p>为了方便计算，我们将两个水平或垂直相邻网格的移动代价设为10，而对角线相邻的网格的移动代价设为14。因为如果以1为水平或垂直移动代价，那么对角线的移动代价为√2，显然这是不利于计算机计算的。</p>
+<h2 id="继续搜索"><a href="#继续搜索" class="headerlink" title="继续搜索"></a>继续搜索</h2><p>接下来要从“打开列表”中选择一个F最低的网格进行下一步的搜索。<br>在经历过第一轮的搜索后，我们在“打开列表”中存放了8个网格，其中F最低的为右边的网格，所以我们选择这个网格进行下一步的搜索。<br><img src="/20220110/astar/3.jpg"></p>
+<ol>
+<li>将这个网格从“打开列表”中删除并添加到“关闭列表中”</li>
+<li>其右边的网格是障碍物，所以忽略其右边的网格。其左边的网格是开始点，已经在删除列表中了，所以也忽略。此时只剩上、下、斜左上和斜左下四个网格。</li>
+<li>计算这四个网格的G值，发现从起点到当前网格再走向这四个网格中的任何一个点，其G值都比从起点直接走向这些点大。所以我们对这四个网格不做任何操作。而且这四个网格已经在“打开列表”中，所以我们也不必再次添加。（而当经过此网格的G值比之前的G值低时，要更新其G值，并将其父网格设置为此网格）</li>
+<li>此时“打开列表”中只剩下7个网格。</li>
+</ol>
+<p>下一步，我们从这7个网格中再找一个F值最小的网格进行下一步的搜索。这时我们发现斜右上和斜右下的F值一样，那么我们选择哪个进行下一步呢？这要取决于你的排序算法，当然这不重要，但是出于速度考虑，可以选择最后一个添加到“打开列表”的网格。。</p>
+<p>所以，我们选择再起点右下方的网格。<br><img src="/20220110/astar/4.jpg"></p>
+<p>这一次，当进行八连通搜索时，右边是墙，上边的两个网格已经在“关闭列表”中了，因此忽略这四个网格。这里我们也忽略了墙下方的网格（这是可选的，也可以视为墙下方的网格可以通过，这取决于你要不要选择从墙的切角过去）。</p>
+<p>剩下的五个网格中，当前网格下方的两个网格没有在“打开列表”中，因此将其添加进去并且将当前网格设置为这两个网格的父网格。然后计算剩下四个网格的G值。接下来一直重复这个过程就可以了。<br><img src="/20220110/astar/5.jpg"></p>
+<h2 id="步骤摘要"><a href="#步骤摘要" class="headerlink" title="步骤摘要"></a>步骤摘要</h2><ol>
+<li>将起始网格添加到“开始列表”中。</li>
+<li>将网格从“打开列表”中删除并将其添加到“关闭列表中”。</li>
+<li>检查所有相邻的网格，忽略障碍、已经在“关闭列表”和其他不可行走的网格。如果他们不在“打开列表”中，则将其添加到列表中设置其父网格为此网格，计算经历此网格到其的G值。如果在“打开列表中”，则计算经历此网格到其的G值，若G值更小，则更新父网格和G值及F值。</li>
+<li>重复以下步骤：</li>
+<li>在“打开列表”中查找F值最低的网格，设置为当前网格。</li>
+<li>将其从“打开列表”删除，添加到“关闭列表”</li>
+<li>搜索其八连通网格，忽略障碍、已添加到“关闭列表”的和其他不可行的网格。</li>
+</ol>
+<ul>
+<li>对于这些网格，将其添加到“打开列表”中并计算其G值，然后根据G值设置父网格和F值。</li>
+<li>选择F值最低的进行下一次搜索。</li>
+</ul>
+<h2 id="广度优先算法"><a href="#广度优先算法" class="headerlink" title="广度优先算法"></a>广度优先算法</h2><p>广度优先算法是最简单的寻路算法，算法执行的结果是获得从地图上任意一点S到其他所有可达点的最短路径，这里只考虑上下左右四方向行走的情况，算法流程非常容易理解：</p>
+<ol>
+<li>设定搜索起点S，放入openList中；</li>
+<li>判断openList是否为空，若为空，搜索结束；若不为空，拿出openList中的第一个节点G；</li>
+<li>遍历G的上下左右四个相邻节点N1-N4，对每个节点N，如果N不在openList或closeList中，那么令N的父节点为G，将N放入openList中；如果N已经在openList或closeList中，跳过不处理；</li>
+<li>将G放入closeList中，重复步骤2.<br><img src="/20220110/astar/6.gif"></li>
+</ol>
+<h2 id="Dijkstra算法"><a href="#Dijkstra算法" class="headerlink" title="Dijkstra算法"></a>Dijkstra算法</h2><blockquote>
+<p>可以视为在A*算法中，只考虑G值而不考虑H。<br>在地图内的每个区块移动消耗不同时，Dijkstra算法可以非常方便的找出从地图上某个起始区块到其他所有可达区块的最短路径，这里仍然只考虑上下左右四个方向移动的情况，算法流程如下：</p>
+</blockquote>
+<p>说明：起始区块记作S，从S到当前区块G的总移动消耗记作CG，优先队列openList中数据为(G,CG)（区块，S到当前区块总移动消耗）,区块G自身移动消耗记作ZG。</p>
+<ol>
+<li>设定起始区块S，将区块S和总移动消耗C=0（记作(S,0)）放入openList，其中openList是一个优先队列(PriorityQueue)，总移动消耗C越低优先级越高；</li>
+<li>判断openList是否为空，如果是空，算法结束；否则，从openList中拿出优先级最高的区块G；</li>
+<li>遍历G的上下左右四个相邻区块N1-N4，对每个区块N，如果N已经在closeList中，忽略该区块；如果N不可达，忽略该区块；否则会有两种情况:</li>
+<li>如果N不在openList中，那么将(N,CN)放入openList中，其中CN=CG+ZN,既S到N的移动总消耗等于S到G的移动总消耗加上N本身的移动消耗，令N的父节点为G;</li>
+<li>如果N已经在openList中，取出(N,CN)，仍然计算CN1=CG+ZN，如果CN1小于CN，用(N,CN1)替换openList中的(N,CN)，令N的父节点为G；如果CN1大于或等于CN，不做处理。</li>
+<li>重复步骤2直至算法结束。<br><img src="/20220110/astar/7.gif"></li>
+</ol>
+<h2 id="Greed-Best-First-Search"><a href="#Greed-Best-First-Search" class="headerlink" title="Greed-Best-First-Search"></a>Greed-Best-First-Search</h2><blockquote>
+<p>可以视为在A*算法中，只考虑H值而不考虑G值<br>网上没有找到比较官方的翻译，有人译作“最好优先贪婪算法”，我们暂时这么称呼它。</p>
+</blockquote>
+<p>最好优先贪婪算法与上面两种算法的不同之处在于，它总是尝试向离目标节点更近的方向探索，怎样才算离目标节点更近呢？在只能上下左右四方向移动的前提下，我们通过计算当前节点到目标节点的曼哈顿距离来进行判断。</p>
+<p>假设当前节点坐标为(x,y)，目标节点的坐标为(x1,y1)，曼哈顿距离计算公式如下：</p>
+<blockquote>
+<p>Manhattan_distance = abs(x1-x)+abs(y1-y)<br>由于曼哈顿距离只在两点之间没有障碍物的情况下才与实际距离相等，一般情况下曼哈顿距离总是小于实际距离。因此，当节点间不存在障碍物时，算法可以保证找出最短路径，但是一旦障碍物出现，最短路径就无法保证了。</p>
+</blockquote>
+<p>算法流程如下：</p>
+<p>说明：起始节点记作S，目标节点记作E，对于任意节点G，从当前节点G到目标节点E的曼哈顿距离记作MG，优先队列openList中数据为(G,MG)（节点，当前节点到目标节点E的曼哈顿距离）。</p>
+<ol>
+<li>将起始节点S放入openList，openList是一个优先队列，曼哈顿距离越小的节点，优先级越高。</li>
+<li>判断openList是否为空，如果为空，搜索失败，目标节点E不可达；如果不为空，从openList中拿出优先级最高的节点G;</li>
+<li>遍历节点G的上下左右四个相邻节点N1-N4，如果N在openList或closeList中，忽略节点N；否则，令N的父节点为G，计算N到E的曼哈顿距离MN，将(N,MN)放入openList。</li>
+<li>判断节点G是不是目标节点E，如果是，搜索成功，获取节点G的父节点，并递归这一过程（继续获得父节点的父节点），直至找到初始节点S，从而获得从G到S的一条路径；否则，重复步骤2。<br><img src="/20220110/astar/8.gif"></li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>A<em>算法中的G就是根据Djkstra算法计算的，而H就是根据最好优先贪婪算法计算的。因此可以将A</em>视为Djkstra算法和最好优先贪婪算法的结合。</p>
+<h3 id="四种算法的选择"><a href="#四种算法的选择" class="headerlink" title="四种算法的选择"></a>四种算法的选择</h3><ol>
+<li>虽然最优选择贪婪算法只在特定情况下才可以找到最短路径（没有障碍物、没有地形移动消耗差异），但是它的运行速度是最快的。如果情况允许，优先使用本算法。</li>
+<li>当需要知道地图上某个点到所有其他点的最短路径，或者反过来，地图上所有点到某个点的最短路径时，选择广度优先算法（各区块移动消耗相同）或Dijkstra算法（各区块移动消耗不同）。</li>
+<li>在一般情况下，使用A*算法总是正确的。</li>
+</ol>
+<h2 id="A-算法实现"><a href="#A-算法实现" class="headerlink" title="A*算法实现"></a>A*算法实现</h2><p><a target="_blank" rel="noopener" href="https://gitee.com/week233/AStartForUnity.git">https://gitee.com/week233/AStartForUnity.git</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">周末</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://yongshen.me/20220110/astar/">https://yongshen.me/20220110/astar/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yongshen.me" target="_blank">周末的游戏之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95/">寻路算法</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/20220110/dda-for-pyopengl/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">DDA画线算法及在PyOpenGL上的实现</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">周末</div><div class="author-info__description">游戏,Unity,游戏开发,程序员</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">5</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div></div><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/AlanWeekend" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:ccz411@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">做一个无聊的人，做一些有趣的事，劈柴🎄、喂马🐎、周游世界🌍</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B%EF%BC%9A%E6%90%9C%E7%B4%A2%E5%8C%BA%E5%9F%9F"><span class="toc-number">1.</span> <span class="toc-text">简介：搜索区域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E5%A7%8B%E6%90%9C%E7%B4%A2"><span class="toc-number">2.</span> <span class="toc-text">开始搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E5%BE%84%E8%AF%84%E5%88%86"><span class="toc-number">3.</span> <span class="toc-text">路径评分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%A7%E7%BB%AD%E6%90%9C%E7%B4%A2"><span class="toc-number">4.</span> <span class="toc-text">继续搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4%E6%91%98%E8%A6%81"><span class="toc-number">5.</span> <span class="toc-text">步骤摘要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E7%AE%97%E6%B3%95"><span class="toc-number">6.</span> <span class="toc-text">广度优先算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Dijkstra%E7%AE%97%E6%B3%95"><span class="toc-number">7.</span> <span class="toc-text">Dijkstra算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Greed-Best-First-Search"><span class="toc-number">8.</span> <span class="toc-text">Greed-Best-First-Search</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">9.</span> <span class="toc-text">总结</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E7%A7%8D%E7%AE%97%E6%B3%95%E7%9A%84%E9%80%89%E6%8B%A9"><span class="toc-number">9.1.</span> <span class="toc-text">四种算法的选择</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A-%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="toc-number">10.</span> <span class="toc-text">A*算法实现</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/20220110/astar/" title="A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想"/></a><div class="content"><a class="title" href="/20220110/astar/" title="A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想">A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想</a><time datetime="2022-01-10T07:00:23.000Z" title="发表于 2022-01-10 15:00:23">2022-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220110/dda-for-pyopengl/" title="DDA画线算法及在PyOpenGL上的实现"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DDA画线算法及在PyOpenGL上的实现"/></a><div class="content"><a class="title" href="/20220110/dda-for-pyopengl/" title="DDA画线算法及在PyOpenGL上的实现">DDA画线算法及在PyOpenGL上的实现</a><time datetime="2022-01-10T02:48:12.000Z" title="发表于 2022-01-10 10:48:12">2022-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220110/python-multilevel-dictionary-merge/" title="Python 多级字典合并"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Python 多级字典合并"/></a><div class="content"><a class="title" href="/20220110/python-multilevel-dictionary-merge/" title="Python 多级字典合并">Python 多级字典合并</a><time datetime="2022-01-10T02:35:07.000Z" title="发表于 2022-01-10 10:35:07">2022-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220110/ARP-Spoofing/" title="浅谈ARP欺骗的实现与防御"><img src="/20220110/ARP-Spoofing/1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="浅谈ARP欺骗的实现与防御"/></a><div class="content"><a class="title" href="/20220110/ARP-Spoofing/" title="浅谈ARP欺骗的实现与防御">浅谈ARP欺骗的实现与防御</a><time datetime="2022-01-10T02:01:24.000Z" title="发表于 2022-01-10 10:01:24">2022-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220107/php-one-sentence-trojan-horse/" title="PHP一句话木马"><img src="/20220107/php-one-sentence-trojan-horse/1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PHP一句话木马"/></a><div class="content"><a class="title" href="/20220107/php-one-sentence-trojan-horse/" title="PHP一句话木马">PHP一句话木马</a><time datetime="2022-01-07T08:27:29.000Z" title="发表于 2022-01-07 16:27:29">2022-01-07</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2022 By 周末</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function addGitalkSource () {
+  const ele = document.createElement('link')
+  ele.rel = 'stylesheet'
+  ele.href= 'https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css'
+  document.getElementsByTagName('head')[0].appendChild(ele)
+}
+
+function loadGitalk () {
+  function initGitalk () {
+    var gitalk = new Gitalk(Object.assign({
+      clientID: '27b2182a5327448c9359',
+      clientSecret: '6a48fa8b2e6d28d932a8610ae4a3794e447ae878',
+      repo: 'alanweekend.github.io',
+      owner: 'AlanWeekend',
+      admin: ['AlanWeekend'],
+      id: '1155ee5c465c4634d181446d94ec61f3',
+      language: 'zh-CN',
+      perPage: 10,
+      distractionFreeMode: false,
+      pagerDirection: 'last',
+      createIssueManually: false,
+      updateCountCallback: commentCount
+    },null))
+
+    gitalk.render('gitalk-container')
+  }
+
+  if (typeof Gitalk === 'function') initGitalk()
+  else {
+    addGitalkSource()
+    getScript('https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.js').then(initGitalk)
+  }
+}
+
+function commentCount(n){
+  let isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
+  if (isCommentCount) {
+    isCommentCount.innerHTML= n
+  }
+}
+
+if ('Gitalk' === 'Gitalk' || !false) {
+  if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
+  else loadGitalk()
+} else {
+  function loadOtherComment () {
+    loadGitalk()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
