@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>动态删除集合中的元素优化</title>
+      <link href="/20220113/collection-dynamic-deletion-optimization/"/>
+      <url>/20220113/collection-dynamic-deletion-optimization/</url>
+      
+        <content type="html"><![CDATA[<h3 id="如何删除一个集合中满足条件的所有元素？"><a href="#如何删除一个集合中满足条件的所有元素？" class="headerlink" title="如何删除一个集合中满足条件的所有元素？"></a>如何删除一个集合中满足条件的所有元素？</h3><p>这是一个很常见的问题，解决方式也五花八门。</p><p>常用的思路一般是找出所有集合中所有满足条件的集合存起来，再遍历这个集合删除其中的元素</p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">static void Main(string[] args)</span><br><span class="line">&#123;</span><br><span class="line">    var lst = new List&lt;int&gt;() &#123; 1, 2, 3, 4, 5, 6, 7, 8, 9 &#125;;</span><br><span class="line">    var tempLst = new List&lt;int&gt;();</span><br><span class="line">    foreach (var item in lst)</span><br><span class="line">    &#123;</span><br><span class="line">        if (item &gt; 5) tempLst.Add(item);</span><br><span class="line">    &#125;</span><br><span class="line">    foreach (var item in tempLst)</span><br><span class="line">    &#123;</span><br><span class="line">        lst.Remove(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>这种方式虽然简单，但有两个缺点</p><blockquote><ol><li>会额外增加GC，因为new了一个新的集合</li><li>会增加额外的遍历次数（第二次集合的遍历）</li></ol></blockquote><p>还见过另外一种思路，foreach中remove之后递归</p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">static void RemoveLst()</span><br><span class="line">&#123;</span><br><span class="line">    var lst = new List&lt;int&gt;() &#123; 1, 2, 3, 4, 5, 6, 7, 8, 9 &#125;;</span><br><span class="line">    foreach (var item in lst)</span><br><span class="line">    &#123;</span><br><span class="line">        if (item &gt; 5) </span><br><span class="line">        &#123;</span><br><span class="line">            lst.Remove(item);</span><br><span class="line">            RemoveLst();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>这种方式可以解决在foreach中动态修改iem的问题，但是缺点也很明显</p><blockquote><ol><li>递归，空间和时间消耗没啥好说的</li><li>增加额外的遍历次数，每次删除一个item都要从头开始遍历一次集合</li></ol></blockquote><h3 id="优化-不产生新的GC也不会额外遍历"><a href="#优化-不产生新的GC也不会额外遍历" class="headerlink" title="优化,不产生新的GC也不会额外遍历"></a>优化,不产生新的GC也不会额外遍历</h3><p>其实可以在for中做动态删除，不过直接删除的话后面的item会自动往前补，比如删掉下标为6的元素”6”，删完之后下标为6的元素就是”7”了，这时候进入下一次循环，下标为7的元素就是”8”,那么”7”实际上是被跳过了。<br>其实可以在for里嵌套一层while,避免被跳过的情况，如果条件满足就一直删除，一直到一个条件不满足的item，进入下一次for循环。<br>在while中删除，item会自动往前补，下一次循环的时候就是后面一个不满足条件的元素，实际上只是把集合中所有的元素只遍历了一遍而已。</p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">static void Main(string[] args)</span><br><span class="line">&#123;</span><br><span class="line">    var lst = new List&lt;int&gt;() &#123; 1, 2, 3, 4, 5, 6, 7, 8, 9 &#125;;</span><br><span class="line">    for (int i = 0; i &lt; lst.Count; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        while (i &lt; lst.Count &amp;&amp; lst[i] &gt; 5)</span><br><span class="line">        &#123;</span><br><span class="line">            lst.RemoveAt(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 算法 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 优化 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>A* 寻路算法在Unity中的实现及广度优先、Djkstra、最好优先贪婪算法思想</title>
       <link href="/20220110/astar/"/>
       <url>/20220110/astar/</url>
