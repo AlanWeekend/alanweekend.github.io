@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>Visual Studio 2022 集成Xlua第三方库 build_xlua_with_libs</title>
+      <link href="/20220117/build-xlua-with-libs/"/>
+      <url>/20220117/build-xlua-with-libs/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://github.com/chexiongsheng/build_xlua_with_libs">build_xlua_with_libs</a></p><p>下载仓库后直接执行.bat会报如下的错误</p><figure class="highlight bat"><table><tr><td class="code"><pre><span class="line">CMake Error:</span><br><span class="line">  Generator</span><br><span class="line"></span><br><span class="line">    Visual Studio <span class="number">15</span> <span class="number">2017</span></span><br><span class="line"></span><br><span class="line">  could <span class="keyword">not</span> <span class="built_in">find</span> any instance of Visual Studio.</span><br></pre></td></tr></table></figure><p>解决方法:</p><ol><li>首先确定Visual Studio已安装cmake组件</li></ol><p><img src="/20220117/build-xlua-with-libs/1.png" alt="Visual Studio Installer"></p><ol start="2"><li><p>参考往上的其他文章，安装使用C++的桌面开发和Visual Studio 扩展开发这两个负荷。不确定是否是必要的，我安装了。</p></li><li><p>修改.bat文件中的generator，如果是Visual Studio 2022 修改为 <code>Visual Studio 17 2022</code></p></li></ol><figure class="highlight bat"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> build64 &amp; <span class="built_in">pushd</span> build64</span><br><span class="line">cmake -G &quot;Visual Studio <span class="number">17</span> <span class="number">2022</span>&quot; ..</span><br><span class="line"><span class="built_in">popd</span></span><br><span class="line">cmake --build build64 --config Release</span><br><span class="line"><span class="built_in">md</span> plugin_lua53\Plugins\x86_64</span><br><span class="line"><span class="built_in">copy</span> /Y build64\Release\xlua.dll plugin_lua53\Plugins\x86_64\xlua.dll</span><br><span class="line"><span class="built_in">pause</span></span><br></pre></td></tr></table></figure><p>其实Visual Studio 版本对应的generator可以在CMAKE-GUI中查看</p><p><img src="/20220117/build-xlua-with-libs/2.png" alt="CMAKE Generator List"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Xlua </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Xlua </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>优化动态删除集合中的元素</title>
       <link href="/20220113/collection-dynamic-deletion-optimization/"/>
       <url>/20220113/collection-dynamic-deletion-optimization/</url>
