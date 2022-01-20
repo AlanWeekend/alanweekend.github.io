@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>学习一个xlua框架总结</title>
+      <link href="/20220120/a-xlua-framework/"/>
+      <url>/20220120/a-xlua-framework/</url>
+      
+        <content type="html"><![CDATA[<h1 id="框架大体结构"><a href="#框架大体结构" class="headerlink" title="框架大体结构"></a>框架大体结构</h1><div class="mermaid">classDiagram    class GameStart{        &lt;&lt;框架入口&gt;&gt;    }    class MonoBehaviour{    }    class Manager{        &lt;&lt;所有模块的引用入口&gt;&gt;    }    class ResourceManager{        &lt;&lt;资源管理器&gt;&gt;    }    class LuaManager{        &lt;&lt;Lua管理器&gt;&gt;    }    class UIManager{        &lt;&lt;UI管理器&gt;&gt;    }    class EntityManager{        &lt;&lt;实体管理器&gt;&gt;    }            class SceneManager{        &lt;&lt;场景管理器&gt;&gt;    }            class SoundManager{        &lt;&lt;声音管理器&gt;&gt;    }            class EventManager{        &lt;&lt;事件管理器&gt;&gt;    }            class PoolManager{        &lt;&lt;对象池管理器&gt;&gt;    }            class NetManager{        &lt;&lt;网络管理器&gt;&gt;    }    class BuildTool{        &lt;&lt;AssetBundle打包工具&gt;&gt;    }    class UnityEx{        &lt;&lt;LuaCallSharp扩展&gt;&gt;    }    GameStart --o MonoBehaviour : 继承    ResourceManager --|&gt; MonoBehaviour : 继承    LuaManager --|&gt; MonoBehaviour : 继承    UIManager --|&gt; MonoBehaviour : 继承    EntityManager --|&gt; MonoBehaviour : 继承    SceneManager --|&gt; MonoBehaviour : 继承    SoundManager --|&gt; MonoBehaviour : 继承    EventManager --|&gt; MonoBehaviour : 继承    PoolManager --|&gt; MonoBehaviour : 继承    NetManager --|&gt; MonoBehaviour : 继承    Manager --o ResourceManager : 包含    Manager --o LuaManager : 包含    Manager --o UIManager : 包含    Manager --o EntityManager : 包含    Manager --o SceneManager : 包含</div>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>lua迭代器总结</title>
       <link href="/20220119/lua-iterator/"/>
       <url>/20220119/lua-iterator/</url>
