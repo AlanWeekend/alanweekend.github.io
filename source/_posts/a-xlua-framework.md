@@ -2,8 +2,11 @@
 title: 学习一个xlua框架总结
 date: 2022-01-20 10:08:26
 categories:
+- [Lua]
 tags:
-cover:
+- Xlua
+- 框架
+cover: 1.png
 ---
 
 # 框架大体结构
@@ -75,7 +78,7 @@ cover:
 
 ---
 
-# BuildTool类
+# BuildTool 打包工具
 
 收集资源及依赖文件打成ab，记录文件列表包括资源名|Bundle名|依赖[]
 {% mermaid %}
@@ -99,7 +102,7 @@ Assets/BuildResources/UI/Prefab/TestUI.prefab|ui/prefab/testui.prefab.ab|Assets/
 
 ---
 
-# GameStart类
+# GameStart 框架入口
 框架入口，挂载到Root节点，读取文件列表，初始化lua等
 ```CSharp
 using UnityEngine;
@@ -201,7 +204,7 @@ flowchart TB
 
 ---
 
-# ResourceManager类
+# ResourceManager 资源管理器
 解析文件列表，加载ab，并对外提供加载各种类型资源的方法。内部使用引用计数，在外部定时卸载引用计数为0的资源。包括编辑器模式加载和Bundle模式加载两种方式。
 {% mermaid %}
     classDiagram
@@ -474,7 +477,7 @@ public void UnloadBundle(UObject obj)
 }
 ```
 ---
-# Pool类
+# PoolManager 池管理器
 池管理类，框架对资源池的设计思想是：可以有多个对象池和引用池，开发者可以自行按照类型去分类
 {% mermaid %}
     classDiagram
@@ -631,7 +634,7 @@ public override void Release()
 }
 ```
 ---
-# Lua管理器
+# LuaManager Lua管理器
 初始化Lua虚拟机，加载Lua脚本
 {% mermaid %}
     classDiagram
@@ -858,7 +861,7 @@ protected virtual void Clear()
 ### OnDestroy
 
 ---
-# UI管理器
+# UIManager UI管理器
 管理所有的UI，包括：UI分组、打开关闭UI
 
 {% mermaid %}
@@ -872,7 +875,577 @@ protected virtual void Clear()
             -Awake()
         }
         class UILogic{
-
+            -Action m_LuaOnOpen
+            -Action m_LuaOnClose
+            +string AssetName
+            +Init(string luaName)
+            +OnOpen()
+            +Close()
+            ~Clear()
         }
-        UIManager --|> MonoBehaviour
+        UIManager --|> MonoBehaviour : 继承
+        UILogic --|> LuaBehaviour : 继承
+        UIManager -- UILogic : 包含
+{% endmermaid %}
+
+## SetUIGroup
+所有的UI分组都是动态创建的，UI分组脚本挂载到Root/UI/Group-*上
+```CSharp
+public void SetUIGroup(List<string> group)
+{
+    for (int i = 0; i < group.Count; i++)
+    {
+        var go = new GameObject($"Group-{group[i]}", typeof(RectTransform));
+        go.transform.SetParent(m_UIParent,false);
+        var rectTransform = go.transform as RectTransform;
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+        m_UIGroups.Add(group[i], go.transform);
+    }
+}
+```
+**这里有一个需要注意的点**
+> 1. 通过new的方式创建GameObejct时，把创建好的对象设置到Canvas下，Transform不会自动转成RectTransform，如果不需要修改RectTransform的属性可以忽略
+> 2. new出来的对象放到Canvas下时，坐标会默认在屏幕左下角，需要手动设置。
+
+![通过new的方式创建GameObject](2.png)
+
+## GetUIGourp 获取UI分组
+从缓存里获取，没啥好说的
+```CSharp
+public Transform GetUIGourp(string group)
+{
+    m_UIGroups.TryGetValue(group, out var go);
+    return go;
+}
+```
+
+## OpenUI 打开UI
+打开UI先从对象池读，对象池没有再去实例化一个，实例化的时候通过Bundle缓存、资源池、AB文件获取，整体流程如下：
+
+{% mermaid %}
+flowchart TB
+    UI名,分组名-- 传入 -->打开UI;
+    打开UI --> id1{从对象池获取};
+    id1-- 有 -->设置分组,打开UI;
+    id1-- 无 -->加载UI;
+    加载UI --> id2{从Bundle缓存获取};
+    id2-- 有 -->实例化UI,绑定UILogic脚本;
+    实例化UI,绑定UILogic脚本 --> 设置分组,打开UI;
+    id2-- 无 -->id3{从资源池获取};
+    id3-- 有 -->从资源池取出;
+    从资源池取出 --> 加载Bundle;
+    id3-- 无 -->从AB文件中读取;
+    从AB文件中读取 --> 加载Bundle;
+    加载Bundle --> 实例化UI,绑定UILogic脚本;
+{% endmermaid %}
+
+## UILogic类
+继承LuaBehaviour 绑定lua脚本，提供类似MonoBehaviour的生命周期，提供打开、关闭的回调。
+
+### Init 初始化
+绑定UI打开和关闭的回调
+```CSharp
+public override void Init(string luaName)
+{
+    base.Init(luaName);
+    m_ScriptEnv.Get("OnOpen", out m_LuaOnOpen);
+    m_ScriptEnv.Get("OnClose", out m_LuaOnClose);
+}
+```
+
+### OnOpen
+调用lua中的打开回调
+```CSharp
+public void OnOpen()
+{
+    m_LuaOnOpen?.Invoke();
+}
+```
+
+### Close
+回收UI到对象池，调用lua中的关闭回调。
+隐藏UI在对象池的回收方法中
+```CSharp
+public void Close()
+{
+    m_LuaOnClose?.Invoke();
+    Manager.Pool.UnSpawn("UI", AssetName, this.gameObject);
+}
+```
+**UI关闭到释放资源的流程**
+{% mermaid %}
+flowchart TB
+    关闭UI-- 回收 -->对象池;
+    对象池-- 到时间没取出使用 -->销毁对象;
+    销毁对象 --> 资源引用计数-1;
+    资源引用计数-1-- 引用计数<=0 --> 资源回收到资源池
+    资源回收到资源池-- 到时间引用计数还是<=0没有取出使用 --> 卸载资源
+{% endmermaid %}
+
+### Clear
+清空绑定的打开和关闭的lua回调
+```CSharp
+protected override void Clear()
+{
+    m_LuaOnOpen = null;
+    m_LuaOnClose = null;
+    base.Clear();
+}
+```
+
+# EntityManager 实体管理器
+管理所有的实体，包括：实体分组、显示隐藏实体。
+与UI管理器不能说毫不相关，只能说一摸一样，详细的可以参考UI管理器及UILogic
+
+{% mermaid %}
+    classDiagram
+        class EntityManager{
+            -Dictionary~string, Transform~ m_EntityGroups
+            -Transform m_EntityParent
+            +SetEntityGroup(List<string> group)
+            +GetEntityGourp(string group) Transform
+            +ShowEntity(string uiName, string group, string luaName)
+            -Awake()
+        }
+        class EntityLogic{
+            -Action m_LuaOnShow
+            -Action m_LuaOnHide
+            +string AssetName
+            +Init(string luaName)
+            +OnShow()
+            +OnHide()
+            ~Clear()
+        }
+        EntityManager --|> MonoBehaviour : 继承
+        EntityLogic --|> LuaBehaviour : 继承
+        EntityManager -- EntityLogic : 包含
+{% endmermaid %}
+
+---
+
+# SceneManager 场景管理器
+管理场景的加载、切换、激活
+
+{% mermaid %}
+    classDiagram
+        class SceneManager{
+            -string m_LogicName
+            +LoadScene(string sceneName, string luaName)
+            +ChangeScene(string sceneName, string luaName)
+            +ActiveScene(string scenName)
+            +UnloadScene(string sceneName)
+            -StartLoadScene(string sceneName, string luaName, LoadSceneMode mode) IEnumerator
+            -UnLoadScene(string sceneName) IEnumerator
+            -GetSceneLogic(Scene scene) SceneLogic
+            -IsLoadedScene(string sceneName) bool
+        }
+        class SceneLogic{
+            -Action m_LuaOnActive
+            -Action m_LuaOnUnActive
+            -Action m_LuaOnEnter
+            -Action m_LuaOnQuit
+            +string SceneName
+            +Init(string luaName)
+            +OnActive()
+            +OnUnActive()
+            +OnEnter()
+            +OnQuit()
+            ~Clear()
+        }
+        SceneManager --|> MonoBehaviour : 继承
+        SceneLogic --|> LuaBehaviour : 继承
+        SceneManager -- SceneLogic : 包含
+{% endmermaid %}
+
+## LoadScene 叠加加载场景
+叠加场景模式加载
+```CSharp
+public void LoadScene(string sceneName, string luaName)
+{
+    Manager.Resource.LoadScene(sceneName, obj =>
+    {
+        StartCoroutine(StartLoadScene(sceneName, luaName, LoadSceneMode.Additive));
+    });
+}
+```
+
+**叠加加载场景和加载单个场景的区别**
+> 叠加场景加载完场景后不销毁原场景
+> 加载单个场景，销毁原场景
+
+## ChangeScene 切换场景
+单场景模式加载
+```CSharp
+public void ChangeScene(string sceneName, string luaName)
+{
+    Manager.Resource.LoadScene(sceneName, obj =>
+    {
+        StartCoroutine(StartLoadScene(sceneName, luaName, LoadSceneMode.Single));
+    });
+}
+```
+
+## ActiveScene 激活场景
+**激活场景**
+> 活动场景是将用作新游戏对象（由脚本实例化）的目标的场景，在这些场景中会使用光照设置。以累加方式添加场景时（请参阅 LoadSceneMode.Additive），第一个场景将仍然保持为活动场景。使用此方法可将活动场景切换为您想作为目标的场景。
+
+```CSharp
+public void ActiveScene(string scenName)
+{
+    var lastScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+    var lastLogic = GetSceneLogic(lastScene);
+    lastLogic?.OnUnActive();
+    var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(scenName);
+    UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
+    var logic = GetSceneLogic(scene);
+    logic?.OnActive();
+}
+```
+
+## UnloadScene 卸载场景
+对外提供的卸载场景的方法
+```CSharp
+public void UnloadScene(string sceneName)
+{
+    StartCoroutine(UnLoadScene(sceneName));
+}
+```
+
+## StartLoadScene 加载场景的实现
+每个场景中都有一个挂载``SceneLogic``脚本的对象继承自``LuaBehaviour``向lua提供场景的生命周期。
+通过``MoveGameObjectToScene``API将挂载``SceneLogic``脚本的对象移动到新场景中去
+```CSharp
+private IEnumerator StartLoadScene(string sceneName, string luaName, LoadSceneMode mode)
+{
+    if (IsLoadedScene(sceneName)) yield break;
+
+    var async = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, mode);
+    async.allowSceneActivation = true;
+    yield return async;
+
+    var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
+    var go = new GameObject(m_LogicName);
+    UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, scene);
+
+    var logic = go.AddComponent<SceneLogic>();
+    logic.SceneName = sceneName;
+    logic.Init(luaName);
+    logic.OnEnter();
+}
+```
+
+## UnLoadScene 卸载场景的实现
+异步卸载场景，调用lua的场景退出回调
+```CSharp
+private IEnumerator UnLoadScene(string sceneName)
+{
+    var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName);
+    if (!scene.isLoaded)
+    {
+        Debug.LogError("Scene not isLoaded");
+        yield break; 
+    }
+
+    var logic = GetSceneLogic(scene);
+    logic?.OnQuit();
+    var async = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
+    yield return async;
+}
+```
+
+### SceneLogic类
+继承LuaBehaviour给lua提供场景的生命周期
+```CSharp
+using System;
+
+public class SceneLogic : LuaBehaviour
+{
+    public string SceneName;
+
+    private Action m_LuaOnActive;
+    private Action m_LuaOnUnActive;
+    private Action m_LuaOnEnter;
+    private Action m_LuaOnQuit;
+
+    public override void Init(string luaName)
+    {
+        base.Init(luaName);
+        m_ScriptEnv.Get("OnActive", out m_LuaOnActive);
+        m_ScriptEnv.Get("OnUnActive", out m_LuaOnUnActive);
+        m_ScriptEnv.Get("OnEnter", out m_LuaOnEnter);
+        m_ScriptEnv.Get("OnQuit", out m_LuaOnQuit);
+    }
+
+    public void OnActive()
+    {
+        m_LuaOnActive?.Invoke();
+    }
+
+    public void OnUnActive()
+    {
+        m_LuaOnUnActive?.Invoke();
+    }
+
+    public void OnEnter()
+    {
+        m_LuaOnEnter?.Invoke();
+    }
+
+    public void OnQuit()
+    {
+        m_LuaOnQuit?.Invoke();
+    }
+
+    protected override void Clear()
+    {
+        m_LuaOnActive = null;
+        m_LuaOnUnActive = null;
+        m_LuaOnEnter = null;
+        m_LuaOnQuit = null;
+        base.Clear();
+    }
+}
+```
+
+---
+
+# SoundManager 声音管理器
+声音分为两种类型，一种是BGM音乐一直循环播放的，一种是音效，只播放一次。
+这里的实现是使用两个AudioSource分别播放BGM和音效
+{% mermaid %}
+    classDiagram
+        class SoundManager{
+            -AudioSource m_MusicAudio
+            -AudioSource m_SoundAudio
+            -float MusicVolume
+            -float SoundVolume
+            +PlayMusic(string name)
+            +PauseMusic()
+            +UnPauseMusic()
+            +StopMusic()
+            +PlaySound()
+            +SetMusicVolume()
+            +SetSoundVolume()
+            -Awake()
+        }
+        SoundManager --|> MonoBehaviour : 继承
+{% endmermaid %}
+这个就比较简单了，没啥好说的直接上代码吧
+```CSharp
+using System.IO;
+using UnityEngine;
+
+public class SoundManager : MonoBehaviour
+{
+    private AudioSource m_MusicAudio;
+    private AudioSource m_SoundAudio;
+
+    private float SoundVolume
+    {
+        get { return PlayerPrefs.GetFloat("SoundVolume", 1.0f); }
+        set
+        {
+            m_SoundAudio.volume = value;
+            PlayerPrefs.SetFloat("SoundVolume", value);
+        }
+    }
+    
+    private float MusicVolume
+    {
+        get { return PlayerPrefs.GetFloat("MusicVolume", 1.0f); }
+        set
+        {
+            m_MusicAudio.volume = value;
+            PlayerPrefs.SetFloat("MusicVolume", value);
+        }
+    }
+
+    private void Awake()
+    {
+        m_MusicAudio = this.gameObject.AddComponent<AudioSource>();
+        m_MusicAudio.playOnAwake = false;
+        m_MusicAudio.loop = true;
+
+        m_SoundAudio = this.gameObject.AddComponent<AudioSource>();
+        m_SoundAudio.loop = false;
+    }
+
+    /// <summary>
+    /// 播放音乐
+    /// </summary>
+    /// <param name="name"></param>
+    public void PlayMusic(string name)
+    {
+        if (this.MusicVolume < 0.1f) return;;
+        string oldName = "";
+        if (m_MusicAudio.clip != null) oldName = m_MusicAudio.clip.name;
+        if (oldName == Path.GetFileNameWithoutExtension(name))
+        {
+            m_MusicAudio.Play();
+            return;
+        }
+        
+        Manager.Resource.LoadMusic(name, obj =>
+        {
+            m_MusicAudio.clip = obj as AudioClip;
+            m_MusicAudio.Play();
+        });
+    }
+
+    /// <summary>
+    /// 暂停音乐
+    /// </summary>
+    public void PauseMusic()
+    {
+        m_MusicAudio.Pause();
+    }
+
+    /// <summary>
+    /// 取消暂停音乐
+    /// </summary>
+    public void UnPauseMusic()
+    {
+        m_MusicAudio.UnPause();
+    }
+
+    /// <summary>
+    /// 停止播放音乐
+    /// </summary>
+    public void StopMusic()
+    {
+        m_MusicAudio.Stop();
+    }
+
+    /// <summary>
+    /// 播放声音
+    /// </summary>
+    /// <param name="name"></param>
+    public void PlaySound(string name)
+    {
+        if (this.SoundVolume < 0.1f) return;
+        
+        Manager.Resource.LoadSound(name, obj =>
+        {
+            m_SoundAudio.PlayOneShot(obj as AudioClip);
+        });
+    }
+
+    /// <summary>
+    /// 设置音乐音量
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetMusicVolume(float value)
+    {
+        this.MusicVolume = value;
+    }
+
+    /// <summary>
+    /// 设置音效音量
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetSoundVolume(float value)
+    {
+        this.SoundVolume = value;
+    }
+}
+```
+
+# EventManager 事件管理器
+其实就是发布订阅模式
+
+{% mermaid %}
+    classDiagram
+        class EventManager{
+            +delegate void EventHandler
+            -Dictionary~int, EventHandler~ m_Events
+            +Subscribe(int id, EventHandler e)
+            +UnSubscribe(int id, EventHandler e)
+            +Fire(int id, object args = null)
+        }
+        SoundManager --|> MonoBehaviour : 继承
+{% endmermaid %}
+
+```CSharp
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EventManager : MonoBehaviour
+{
+    public delegate void EventHandler(object args);
+
+    private Dictionary<int, EventHandler> m_Events = new Dictionary<int, EventHandler>();
+
+    public void Subscribe(int id, EventHandler e)
+    {
+        if (m_Events.ContainsKey(id))
+        {
+            m_Events[id] += e;
+        }
+        else
+        {
+            m_Events.Add(id, e);
+        }
+    }
+
+    public void UnSubscribe(int id, EventHandler e)
+    {
+        if (m_Events.ContainsKey(id))
+        {
+            if (m_Events[id] != null)
+            {
+                m_Events[id] -= e;
+            }
+            else
+            {
+                m_Events.Remove(id);
+            }
+        }
+    }
+
+    public void Fire(int id, object args = null)
+    {
+        if (m_Events.TryGetValue(id, out var handler))
+        {
+            handler(args);
+        }
+    }
+}
+```
+
+# NetManager 网络管理器
+ {% mermaid %}
+    classDiagram
+        class NetManager{
+            -NetClient m_NetClient
+            -Queue~KeyValuePair<int, string>~ m_MessageQueue
+            -LuaFunction ReceiveMessage
+            +Init()
+            +SendMessage(int messageId, string message)
+            +OnConnectedToServer(string host,int port)
+            +OnNetConnected()
+            +OnDisConnected()
+            +Receive(int msgId, string message)
+            -Update()
+        }
+        class NetClient{
+            -TcpClient m_Client
+            -NetworkStream m_TcpStream
+            -const int BufferSize
+            -byte[] m_Buffer = new byte[BufferSize]
+            -MemoryStream m_MemStream
+            -BinaryReader m_BinaryReader
+            +NetClient()
+            +OnConnectServer(string host, int port)
+            +SendMessage(int msgID, string message)
+            -OnConnect(IAsyncResult asyncResult)
+            -OnRead(IAsyncResult asyncResult)
+            -OnDisConnected()
+            -ReceiveData()
+            -OnEndSend(IAsyncResult asyncResult)
+            -RemainingBytesLength()
+        }
+        NetManager --|> MonoBehaviour : 继承
 {% endmermaid %}
