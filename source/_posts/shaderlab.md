@@ -2,7 +2,9 @@
 title: ShaderLab基础
 date: 2022-06-14 10:23:07
 categories:
+- [Shader]
 tags:
+- Shader入门精要
 cover: 1.jpg
 ---
 # ShaderLab基础结构

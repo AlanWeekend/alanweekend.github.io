@@ -109,3 +109,11 @@ deploy:
 marked:
   prependRoot: true
   postAsset: true
+
+markdown_it_plus:
+  plugins:
+    - plugin:
+      name: '@neilsustc/markdown-it-katex'
+      enable: true
+      options:
+        strict: false #禁用掉 KaTeX 在命令行上输出的宂长的警告信息
