@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>UnityWebgl转微信小程序屏幕适配</title>
+      <link href="/20220719/UnityWebGLToWX/"/>
+      <url>/20220719/UnityWebGLToWX/</url>
+      
+        <content type="html"><![CDATA[<img src="1.png" width = 40%/><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">WX.InitSDK((int code) =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    // 你的主逻辑</span><br><span class="line">    var info = WX.GetSystemInfoSync();</span><br><span class="line">    var systemBarHeight = info.statusBarHeight; // 状态栏高度</span><br><span class="line">    var menu = WX.GetMenuButtonBoundingClientRect();</span><br><span class="line">    var navigationBarHeight = menu.height; // 胶囊栏高度</span><br><span class="line">    float py = ((float)info.windowHeight - (float)(systemBarHeight + navigationBarHeight)) / (float)info.windowHeight;</span><br><span class="line">    // 调整UI根节点Rect</span><br><span class="line">    var rect = UIKit.Root.Common.GetComponent&lt;RectTransform&gt;();</span><br><span class="line">    rect.anchorMax = new Vector2(1, py);</span><br><span class="line">    rect.offsetMax = Vector2.zero;</span><br><span class="line">    rect.offsetMin = Vector2.zero;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>变换坐标系</title>
       <link href="/20220615/bianhuanzuobiaoxi/"/>
       <url>/20220615/bianhuanzuobiaoxi/</url>
