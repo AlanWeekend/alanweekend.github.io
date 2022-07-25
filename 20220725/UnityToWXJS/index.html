@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unity转微信小游戏与JS交互 | 周末的游戏之旅</title><meta name="author" content="周末"><meta name="copyright" content="周末"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="微信小游戏JS交互方式：  微信小游戏机制问题，在微信小游戏中不会加载index.html，所以写在index.html的函数均不会被调用到  1.自行创建calljs.js文件中添加定义，每次编译该文件都会被覆盖 export const CallJS&#x3D;&amp;#123;  test:function()&amp;#123;    console.log(&quot;test&quot;);  &amp;#125;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity转微信小游戏与JS交互">
+<meta property="og:url" content="https://yongshen.me/20220725/UnityToWXJS/index.html">
+<meta property="og:site_name" content="周末的游戏之旅">
+<meta property="og:description" content="微信小游戏JS交互方式：  微信小游戏机制问题，在微信小游戏中不会加载index.html，所以写在index.html的函数均不会被调用到  1.自行创建calljs.js文件中添加定义，每次编译该文件都会被覆盖 export const CallJS&#x3D;&amp;#123;  test:function()&amp;#123;    console.log(&quot;test&quot;);  &amp;#125;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yongshen.me/20220725/UnityToWXJS/1.png">
+<meta property="article:published_time" content="2022-07-25T01:37:50.000Z">
+<meta property="article:modified_time" content="2022-07-25T01:40:17.062Z">
+<meta property="article:author" content="周末">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yongshen.me/20220725/UnityToWXJS/1.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yongshen.me/20220725/UnityToWXJS/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Unity转微信小游戏与JS交互',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-07-25 09:40:17'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="https://yongshen.me/WithWhatForUnity/"><span> WithWhat插件文档</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/Collection/"><i class="fa-fw fas fa-book"></i><span> 收藏</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">周末的游戏之旅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="https://yongshen.me/WithWhatForUnity/"><span> WithWhat插件文档</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/Collection/"><i class="fa-fw fas fa-book"></i><span> 收藏</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Unity转微信小游戏与JS交互</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-07-25T01:37:50.000Z" title="发表于 2022-07-25 09:37:50">2022-07-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-07-25T01:40:17.062Z" title="更新于 2022-07-25 09:40:17">2022-07-25</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Unity转微信小游戏与JS交互"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/20220725/UnityToWXJS/#post-comment"><span class="gitalk-comment-count"></span></a></span></div></div></div><article class="post-content" id="article-container"><h1 id="微信小游戏js交互方式"><a class="markdownIt-Anchor" href="#微信小游戏js交互方式"></a> 微信小游戏JS交互方式：</h1>
+<blockquote>
+<p>微信小游戏机制问题，在微信小游戏中不会加载index.html，所以写在index.html的函数均不会被调用到</p>
+</blockquote>
+<p>1.自行创建<code>calljs.js</code>文件中添加定义，<strong>每次编译该文件都会被覆盖</strong></p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> CallJS=&#123;</span><br><span class="line">  <span class="attr">test</span>:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.在<code>game.js</code>中引入</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./weapp-adapter&#x27;</span></span><br><span class="line"><span class="keyword">import</span> unityNamespace <span class="keyword">from</span> <span class="string">&#x27;./unity-namespace&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./webgl.wasm.framework.unityweb&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./unity-sdk/index.js&quot;</span></span><br><span class="line"><span class="keyword">import</span> checkVersion, &#123;canUseCoverview&#125; <span class="keyword">from</span> <span class="string">&#x27;./check-version&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;texture-config.js&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;launchEventType&#125; <span class="keyword">from</span> <span class="string">&#x27;./plugin-config&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123;CallJS&#125; <span class="keyword">from</span> <span class="string">&#x27;./calljs&#x27;</span> <span class="comment">// 引入自定义JS调用代码</span></span><br></pre></td></tr></table></figure>
+<p>挂载到<code>GameGlobal</code>对象上，第32行下</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">GameGlobal.managerConfig = managerConfig;</span><br><span class="line">GameGlobal.CallJS = CallJS; <span class="comment">// 挂载</span></span><br></pre></td></tr></table></figure>
+<p>3.调用案例，小游戏侧无需实现，在Unity的胶水层定义</p>
+<blockquote>
+<p>Unity自定义的胶水层代码会被编译到<code>webgl.wasm.framework.unityweb.js</code>中</p>
+</blockquote>
+<p><img src="1.png" alt="" /></p>
+<p>点击按钮，在Unity中通过胶水层调用<code>_Buy</code>函数</p>
+<p><img src="2.png" alt="" /></p>
+<h1 id="webgl的js交互方式"><a class="markdownIt-Anchor" href="#webgl的js交互方式"></a> WebGL的JS交互方式：</h1>
+<p>1.使用和微信小游戏中同样的引入方式，自行定义<code>GameGlobal</code>并挂载<code>CallJS</code>对象，保持和小游戏中相同的定义方式。在胶水层统一调用，不再做区分处理。</p>
+<p><img src="3.png" alt="" /><br />
+<img src="4.png" alt="" /></p>
+<h1 id="calljs更新方式建议"><a class="markdownIt-Anchor" href="#calljs更新方式建议"></a> calljs更新方式建议：</h1>
+<p>建议在unity中将calljs做模板处理，不需要每次都修改index.html和game.js。只需要替换calljs.js文件即可。<br />
+WebGL模板修改<code>WXTemplate</code>或<code>WXTemplate2020</code><br />
+小游戏模板修改<code>WX-WASM-SDK\wechat-default</code></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">周末</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://yongshen.me/20220725/UnityToWXJS/">https://yongshen.me/20220725/UnityToWXJS/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yongshen.me" target="_blank">周末的游戏之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="/20220725/UnityToWXJS/1.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/20220719/UnityWebGLToWX/"><img class="next-cover" src="/20220719/UnityWebGLToWX/1.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">UnityWebgl转微信小游戏屏幕适配</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">周末</div><div class="author-info__description">游戏,Unity,游戏开发,程序员</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">11</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div></div><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/AlanWeekend" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:ccz411@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">做一个无聊的人，做一些有趣的事，劈柴🎄、喂马🐎、周游世界🌍</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%AE%E4%BF%A1%E5%B0%8F%E6%B8%B8%E6%88%8Fjs%E4%BA%A4%E4%BA%92%E6%96%B9%E5%BC%8F"><span class="toc-number">1.</span> <span class="toc-text"> 微信小游戏JS交互方式：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#webgl%E7%9A%84js%E4%BA%A4%E4%BA%92%E6%96%B9%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text"> WebGL的JS交互方式：</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#calljs%E6%9B%B4%E6%96%B0%E6%96%B9%E5%BC%8F%E5%BB%BA%E8%AE%AE"><span class="toc-number">3.</span> <span class="toc-text"> calljs更新方式建议：</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/20220725/UnityToWXJS/" title="Unity转微信小游戏与JS交互"><img src="/20220725/UnityToWXJS/1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Unity转微信小游戏与JS交互"/></a><div class="content"><a class="title" href="/20220725/UnityToWXJS/" title="Unity转微信小游戏与JS交互">Unity转微信小游戏与JS交互</a><time datetime="2022-07-25T01:37:50.000Z" title="发表于 2022-07-25 09:37:50">2022-07-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220719/UnityWebGLToWX/" title="UnityWebgl转微信小游戏屏幕适配"><img src="/20220719/UnityWebGLToWX/1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="UnityWebgl转微信小游戏屏幕适配"/></a><div class="content"><a class="title" href="/20220719/UnityWebGLToWX/" title="UnityWebgl转微信小游戏屏幕适配">UnityWebgl转微信小游戏屏幕适配</a><time datetime="2022-07-19T00:47:57.000Z" title="发表于 2022-07-19 08:47:57">2022-07-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220615/bianhuanzuobiaoxi/" title="变换坐标系"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="变换坐标系"/></a><div class="content"><a class="title" href="/20220615/bianhuanzuobiaoxi/" title="变换坐标系">变换坐标系</a><time datetime="2022-06-15T09:41:50.000Z" title="发表于 2022-06-15 17:41:50">2022-06-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220615/matrix-conversion-vector/" title="矩阵转换向量"><img src="/20220615/matrix-conversion-vector/1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="矩阵转换向量"/></a><div class="content"><a class="title" href="/20220615/matrix-conversion-vector/" title="矩阵转换向量">矩阵转换向量</a><time datetime="2022-06-15T09:07:25.000Z" title="发表于 2022-06-15 17:07:25">2022-06-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/20220615/matrix-cross-vector/" title="向量与矩阵相乘"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="向量与矩阵相乘"/></a><div class="content"><a class="title" href="/20220615/matrix-cross-vector/" title="向量与矩阵相乘">向量与矩阵相乘</a><time datetime="2022-06-15T08:39:27.000Z" title="发表于 2022-06-15 16:39:27">2022-06-15</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2021 - 2022 By 周末</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><script>var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',preloader.endLoading())</script><div class="js-pjax"><script>if (document.getElementsByClassName('mermaid').length) {
+  if (window.mermaidJsLoad) mermaid.init()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(() => {
+      window.mermaidJsLoad = true
+      mermaid.initialize({
+        theme: 'default',
+      })
+      false && mermaid.init()
+    })
+  }
+}</script><script>function addGitalkSource () {
+  const ele = document.createElement('link')
+  ele.rel = 'stylesheet'
+  ele.href= 'https://cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.css'
+  document.getElementsByTagName('head')[0].appendChild(ele)
+}
+
+function loadGitalk () {
+  function initGitalk () {
+    var gitalk = new Gitalk(Object.assign({
+      clientID: '27b2182a5327448c9359',
+      clientSecret: '6a48fa8b2e6d28d932a8610ae4a3794e447ae878',
+      repo: 'alanweekend.github.io',
+      owner: 'AlanWeekend',
+      admin: ['AlanWeekend'],
+      id: 'd2025677dc7dda884a839b62f21cf655',
+      language: 'zh-CN',
+      perPage: 10,
+      distractionFreeMode: false,
+      pagerDirection: 'last',
+      createIssueManually: false,
+      updateCountCallback: commentCount
+    },null))
+
+    gitalk.render('gitalk-container')
+  }
+
+  if (typeof Gitalk === 'function') initGitalk()
+  else {
+    addGitalkSource()
+    getScript('https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.js').then(initGitalk)
+  }
+}
+
+function commentCount(n){
+  let isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
+  if (isCommentCount) {
+    isCommentCount.innerHTML= n
+  }
+}
+
+if ('Gitalk' === 'Gitalk' || !false) {
+  if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
+  else loadGitalk()
+} else {
+  function loadOtherComment () {
+    loadGitalk()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

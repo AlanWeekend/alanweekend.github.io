@@ -4,7 +4,20 @@
   
     
     <entry>
-      <title>UnityWebgl转微信小程序屏幕适配</title>
+      <title>Unity转微信小游戏与JS交互</title>
+      <link href="/20220725/UnityToWXJS/"/>
+      <url>/20220725/UnityToWXJS/</url>
+      
+        <content type="html"><![CDATA[<h1 id="微信小游戏js交互方式"><a class="markdownIt-Anchor" href="#微信小游戏js交互方式"></a> 微信小游戏JS交互方式：</h1><blockquote><p>微信小游戏机制问题，在微信小游戏中不会加载index.html，所以写在index.html的函数均不会被调用到</p></blockquote><p>1.自行创建<code>calljs.js</code>文件中添加定义，<strong>每次编译该文件都会被覆盖</strong></p><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> CallJS=&#123;</span><br><span class="line">  <span class="attr">test</span>:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>2.在<code>game.js</code>中引入</p><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./weapp-adapter&#x27;</span></span><br><span class="line"><span class="keyword">import</span> unityNamespace <span class="keyword">from</span> <span class="string">&#x27;./unity-namespace&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./webgl.wasm.framework.unityweb&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;./unity-sdk/index.js&quot;</span></span><br><span class="line"><span class="keyword">import</span> checkVersion, &#123;canUseCoverview&#125; <span class="keyword">from</span> <span class="string">&#x27;./check-version&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;texture-config.js&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;launchEventType&#125; <span class="keyword">from</span> <span class="string">&#x27;./plugin-config&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123;CallJS&#125; <span class="keyword">from</span> <span class="string">&#x27;./calljs&#x27;</span> <span class="comment">// 引入自定义JS调用代码</span></span><br></pre></td></tr></table></figure><p>挂载到<code>GameGlobal</code>对象上，第32行下</p><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">GameGlobal.managerConfig = managerConfig;</span><br><span class="line">GameGlobal.CallJS = CallJS; <span class="comment">// 挂载</span></span><br></pre></td></tr></table></figure><p>3.调用案例，小游戏侧无需实现，在Unity的胶水层定义</p><blockquote><p>Unity自定义的胶水层代码会被编译到<code>webgl.wasm.framework.unityweb.js</code>中</p></blockquote><p><img src="1.png" alt="" /></p><p>点击按钮，在Unity中通过胶水层调用<code>_Buy</code>函数</p><p><img src="2.png" alt="" /></p><h1 id="webgl的js交互方式"><a class="markdownIt-Anchor" href="#webgl的js交互方式"></a> WebGL的JS交互方式：</h1><p>1.使用和微信小游戏中同样的引入方式，自行定义<code>GameGlobal</code>并挂载<code>CallJS</code>对象，保持和小游戏中相同的定义方式。在胶水层统一调用，不再做区分处理。</p><p><img src="3.png" alt="" /><br /><img src="4.png" alt="" /></p><h1 id="calljs更新方式建议"><a class="markdownIt-Anchor" href="#calljs更新方式建议"></a> calljs更新方式建议：</h1><p>建议在unity中将calljs做模板处理，不需要每次都修改index.html和game.js。只需要替换calljs.js文件即可。<br />WebGL模板修改<code>WXTemplate</code>或<code>WXTemplate2020</code><br />小游戏模板修改<code>WX-WASM-SDK\wechat-default</code></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>UnityWebgl转微信小游戏屏幕适配</title>
       <link href="/20220719/UnityWebGLToWX/"/>
       <url>/20220719/UnityWebGLToWX/</url>
       
