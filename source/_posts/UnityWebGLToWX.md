@@ -1,5 +1,5 @@
 ---
-title: UnityWebgl转微信小程序屏幕适配
+title: UnityWebgl转微信小游戏屏幕适配
 katex: false
 date: 2022-07-19 08:47:57
 categories:
